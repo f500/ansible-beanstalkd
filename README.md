@@ -6,7 +6,8 @@ Install and start beanstalkd
 Requirements
 ------------
 
-Debian Wheezy with the package python-pycurl and python-software-properties installed.
+Debian Wheezy with the package **build-essential** installed.
+
 
 Role Variables
 --------------

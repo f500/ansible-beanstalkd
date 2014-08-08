@@ -1,0 +1,24 @@
+---
+- name: Get tarfile
+  command: wget https://github.com/kr/beanstalkd/archive/v1.9.tar.gz -q -O /tmp/beanstalkd.tar.gz creates=/tmp/beanstalkd.tar.gz
+
+- name: Unarchive
+  command: tar -zxvf /tmp/beanstalkd.tar.gz chdir=/tmp creates=/tmp/beanstalkd-1.9
+
+- name: Make
+  command: make chdir=/tmp/beanstalkd-1.9/ creates=/tmp/beanstalkd-1.9/beanstalkd
+
+- name: Install
+  command: make install chdir=/tmp/beanstalkd-1.9/ creates=/usr/local/bin/beanstalkd
+
+- name: Copy beanstalkd startup script
+  copy: src=beanstalkd.initd dest=/etc/init.d/beanstalkd mode=0755
+
+- name: Copy config
+  template: src=beanstalkd dest=/etc/default/beanstalkd
+
+- name: Create user
+  user: name=beanstalkd comment="Beanstalkd Server" home=/var/lib/beanstalkd system=yes shell=/bin/false state=present
+
+- name: Start service (on boot)
+  service: name=beanstalkd enabled=yes state=started

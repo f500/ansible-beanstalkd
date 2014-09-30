@@ -15,6 +15,9 @@ Role Variables
     beanstalkd_listen_addr: 0.0.0.0
     beanstalkd_listen_port: 11300
     beanstalkd_enabled: "yes"
+    
+    beanstalkd_persistent: No
+    beanstalkd_storage: "/var/lib/beanstalkd"
 
 Example Playbook
 -------------------------

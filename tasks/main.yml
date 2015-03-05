@@ -1,4 +1,7 @@
 ---
+- name: Ensure build-essential package is installed
+  apt: pkg=build-essential state=present
+
 - name: Get tarfile
   command: wget https://github.com/kr/beanstalkd/archive/v{{ beanstalkd_version }}.tar.gz -q -O /tmp/beanstalkd.tar.gz creates=/tmp/beanstalkd.tar.gz
 

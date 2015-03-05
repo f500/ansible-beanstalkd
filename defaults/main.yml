@@ -1,7 +1,7 @@
 ---
-
-beanstalkd_listen_addr: 0.0.0.0
-beanstalkd_listen_port: 11300
+beanstalkd_version: "1.9"
+beanstalkd_listen_addr: "0.0.0.0"
+beanstalkd_listen_port: "11300"
 beanstalkd_enabled: "yes"
 
 beanstalkd_persistent: No

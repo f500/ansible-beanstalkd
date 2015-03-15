@@ -1,15 +1,27 @@
 ---
+- name: Discover if there is already a version of Beanstalkd installed
+  shell: which beanstalkd > /dev/null && beanstalkd -v | cut -d' ' -f2
+  changed_when: False
+  failed_when: False
+  register: installed_beanstalkd_version
+
 - name: Get tarfile
-  command: wget https://github.com/kr/beanstalkd/archive/v{{ beanstalkd_version }}.tar.gz -q -O /tmp/beanstalkd.tar.gz creates=/tmp/beanstalkd.tar.gz
+  command: wget https://github.com/kr/beanstalkd/archive/v{{ beanstalkd_version }}.tar.gz -q -O /tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz creates=/tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz
 
 - name: Unarchive
-  command: tar -zxvf /tmp/beanstalkd.tar.gz chdir=/tmp creates=/tmp/beanstalkd-{{ beanstalkd_version }}
+  command: tar -zxvf /tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz chdir=/tmp creates=/tmp/beanstalkd-{{ beanstalkd_version }}
 
 - name: Make
   command: make chdir=/tmp/beanstalkd-{{ beanstalkd_version}}/ creates=/tmp/beanstalkd-{{ beanstalkd_version}}/beanstalkd
 
+- name: Remove current version
+  file: path=/usr/local/bin/beanstalkd state=absent
+  when: installed_beanstalkd_version.stdout != beanstalkd_version
+
 - name: Install
-  command: make install chdir=/tmp/beanstalkd-{{ beanstalkd_version}}/ creates=/usr/local/bin/beanstalkd
+  command: make install chdir=/tmp/beanstalkd-{{ beanstalkd_version}}/
+  when: installed_beanstalkd_version.stdout != beanstalkd_version
+  notify: restart beanstalkd
 
 - name: Copy beanstalkd startup script
   copy: src=beanstalkd.initd dest=/etc/init.d/beanstalkd mode=0755

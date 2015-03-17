@@ -1,4 +1,5 @@
 ---
+
 - name: Discover if there is already a version of beanstalkd installed.
   shell: which beanstalkd > /dev/null && beanstalkd -v | cut -d' ' -f2
   changed_when: False
@@ -14,6 +15,10 @@
   register: storage_dir_changed
   notify: restart beanstalkd
 
+- name: Ensure build-essential package is installed
+  apt: pkg=build-essential state=present
+  when: installed_beanstalkd_version.stdout != beanstalkd_version
+  
 - name: Get tarfile.
   command: wget https://github.com/kr/beanstalkd/archive/v{{ beanstalkd_version }}.tar.gz -q -O /tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz creates=/tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz
   when: installed_beanstalkd_version.stdout != beanstalkd_version

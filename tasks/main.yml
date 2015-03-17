@@ -1,5 +1,4 @@
 ---
-
 - name: Discover if there is already a version of beanstalkd installed.
   shell: which beanstalkd > /dev/null && beanstalkd -v | cut -d' ' -f2
   changed_when: False

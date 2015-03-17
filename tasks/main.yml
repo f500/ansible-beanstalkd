@@ -7,10 +7,11 @@
 
 - name: Ensure beanstalkd user exists.
   user: name={{ beanstalkd_user }} comment="Beanstalkd Server" createhome=no shell=/bin/false system=yes state=present
-  notify: restart beanstalkd
+  register: user_changed
 
 - name: Ensure persistence storage location exists and has proper ownership.
   file: path="{{ beanstalkd_storage }}" state=directory owner={{ beanstalkd_user }} group={{ beanstalkd_user }} recurse=true
+  register: storage_dir_changed
   notify: restart beanstalkd
 
 - name: Get tarfile.
@@ -36,6 +37,7 @@
 
 - name: Stop service (in case beanstalkd_user changed, we can't wait for the handler).
   service: name=beanstalkd state=stopped
+  when: user_changed.changed or storage_dir_changed.changed
 
 - name: Ensure startup script is correct.
   template: src=beanstalkd.initd dest=/etc/init.d/beanstalkd mode=0755

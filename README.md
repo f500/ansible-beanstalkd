@@ -13,12 +13,16 @@ Role Variables
 --------------
 
     beanstalkd_version: "1.10"
-    beanstalkd_listen_addr: 0.0.0.0
-    beanstalkd_listen_port: 11300
+    beanstalkd_listen_addr: "0.0.0.0"
+    beanstalkd_listen_port: "11300"
+    beanstalkd_user: "beanstalkd"
     beanstalkd_enabled: "yes"
     
-    beanstalkd_persistent: No
+    beanstalkd_persistent: Yes
     beanstalkd_storage: "/var/lib/beanstalkd"
+
+Warning: Changing beanstalkd_storage after an initial install will result in the
+original binlog data being orphaned in the original location.
 
 Example Playbook
 -------------------------

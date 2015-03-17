@@ -6,7 +6,11 @@ Install and start beanstalkd
 Requirements
 ------------
 
-Debian Wheezy with the package **build-essential** installed.
+Debian Wheezy.
+
+Warning: This role will install **build-essential** if it isn't already present.
+Some people consider this a security risk.  If you're one of them,  you should 
+remove build-essential in a role that runs later, or manually.
 
 
 Role Variables

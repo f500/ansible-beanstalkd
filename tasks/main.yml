@@ -1,36 +1,47 @@
 ---
-- name: Discover if there is already a version of Beanstalkd installed
+- name: Discover if there is already a version of beanstalkd installed.
   shell: which beanstalkd > /dev/null && beanstalkd -v | cut -d' ' -f2
   changed_when: False
   failed_when: False
   register: installed_beanstalkd_version
 
-- name: Get tarfile
+- name: Ensure beanstalkd user exists.
+  user: name={{ beanstalkd_user }} comment="Beanstalkd Server" createhome=no shell=/bin/false system=yes state=present
+  notify: restart beanstalkd
+
+- name: Ensure persistence storage location exists and has proper ownership.
+  file: path="{{ beanstalkd_storage }}" state=directory owner={{ beanstalkd_user }} group={{ beanstalkd_user }} recurse=true
+  notify: restart beanstalkd
+
+- name: Get tarfile.
   command: wget https://github.com/kr/beanstalkd/archive/v{{ beanstalkd_version }}.tar.gz -q -O /tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz creates=/tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz
+  when: installed_beanstalkd_version.stdout != beanstalkd_version
 
-- name: Unarchive
+- name: Unarchive.
   command: tar -zxvf /tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz chdir=/tmp creates=/tmp/beanstalkd-{{ beanstalkd_version }}
+  when: installed_beanstalkd_version.stdout != beanstalkd_version
 
-- name: Make
+- name: Make.
   command: make chdir=/tmp/beanstalkd-{{ beanstalkd_version}}/ creates=/tmp/beanstalkd-{{ beanstalkd_version}}/beanstalkd
+  when: installed_beanstalkd_version.stdout != beanstalkd_version
 
-- name: Remove current version
+- name: Remove current version.
   file: path=/usr/local/bin/beanstalkd state=absent
   when: installed_beanstalkd_version.stdout != beanstalkd_version
 
-- name: Install
+- name: Install.
   command: make install chdir=/tmp/beanstalkd-{{ beanstalkd_version}}/
   when: installed_beanstalkd_version.stdout != beanstalkd_version
   notify: restart beanstalkd
 
-- name: Copy beanstalkd startup script
-  copy: src=beanstalkd.initd dest=/etc/init.d/beanstalkd mode=0755
+- name: Stop service (in case beanstalkd_user changed, we can't wait for the handler).
+  service: name=beanstalkd state=stopped
 
-- name: Copy config
+- name: Ensure startup script is correct.
+  template: src=beanstalkd.initd dest=/etc/init.d/beanstalkd mode=0755
+
+- name: Ensure configuration is correct.
   template: src=beanstalkd dest=/etc/default/beanstalkd
 
-- name: Create user
-  user: name=beanstalkd comment="Beanstalkd Server" home=/var/lib/beanstalkd system=yes shell=/bin/false state=present
-
-- name: Start service (on boot)
+- name: Ensure service is running, and is configured to start on boot.
   service: name=beanstalkd enabled=yes state=started

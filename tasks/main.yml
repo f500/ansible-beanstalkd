@@ -35,12 +35,12 @@
   when: installed_beanstalkd_version.stdout != beanstalkd_version
   notify: restart beanstalkd
 
+- name: Ensure startup script is correct.
+  template: src=beanstalkd.initd dest=/etc/init.d/beanstalkd mode=0755
+  
 - name: Stop service (in case beanstalkd_user changed, we can't wait for the handler).
   service: name=beanstalkd state=stopped
   when: user_changed.changed or storage_dir_changed.changed
-
-- name: Ensure startup script is correct.
-  template: src=beanstalkd.initd dest=/etc/init.d/beanstalkd mode=0755
 
 - name: Ensure configuration is correct.
   template: src=beanstalkd dest=/etc/default/beanstalkd

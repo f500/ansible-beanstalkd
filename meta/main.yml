@@ -9,6 +9,6 @@ galaxy_info:
   - name: Debian
     versions:
       - wheezy
-  categories:
+  galaxy_tags:
     - system
 dependencies: []

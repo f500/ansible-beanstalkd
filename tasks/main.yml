@@ -15,9 +15,11 @@
   notify: restart beanstalkd
 
 - name: Get tarfile.
-  command: wget https://github.com/kr/beanstalkd/archive/v{{ beanstalkd_version }}.tar.gz -q -O /tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz creates=/tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz
+  get_url:
+    url: "https://github.com/kr/beanstalkd/archive/v{{ beanstalkd_version }}.tar.gz"
+    dest: "/tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz"
   when: installed_beanstalkd_version.stdout != beanstalkd_version
-
+    
 - name: Unarchive.
   command: tar -zxvf /tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz chdir=/tmp creates=/tmp/beanstalkd-{{ beanstalkd_version }}
   when: installed_beanstalkd_version.stdout != beanstalkd_version

@@ -19,7 +19,7 @@
     url: "https://github.com/kr/beanstalkd/archive/v{{ beanstalkd_version }}.tar.gz"
     dest: "/tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz"
   when: installed_beanstalkd_version.stdout != beanstalkd_version
-    
+
 - name: Unarchive.
   command: tar -zxvf /tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz chdir=/tmp creates=/tmp/beanstalkd-{{ beanstalkd_version }}
   when: installed_beanstalkd_version.stdout != beanstalkd_version

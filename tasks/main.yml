@@ -21,7 +21,7 @@
   when: installed_beanstalkd_version.stdout != beanstalkd_version
 
 - name: Unarchive.
-  command: tar -zxvf /tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz chdir=/tmp creates=/tmp/beanstalkd-{{ beanstalkd_version }}
+  unarchive: remote_src=true src=/tmp/beanstalkd-{{ beanstalkd_version }}.tar.gz dest=/tmp
   when: installed_beanstalkd_version.stdout != beanstalkd_version
 
 - name: Make.
